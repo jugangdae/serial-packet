@@ -1,4 +1,4 @@
-# serial-packet-lib
+# serial-utils
 
 ```
 git clone https://github.com/jugangdae/serial-utils
