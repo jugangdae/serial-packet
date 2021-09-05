@@ -4,46 +4,70 @@
 #include<stdint.h>
 #include"packet_user.h"
 
-#define USE_LENGTH
-#define USE_COMMAND
-//#define USE_ENDBYTE
-#define USE_CRC
-
-#define LENGTH_TYPE 8
-#define CRC_TYPE 8
-
-#define PACKET_HEAD_SIZE 2
-#define PACKET_TAIL_SIZE 1
-#define PACKET_CMD_SIZE 1
-
 typedef struct __Packet{
-	uint8_t header;
-	//uint8_t sequenceNumber;
-	uint8_t length;
-	uint8_t command;
+
+	pk_hdr_t header;
+
+#ifdef USE_SEQNUM
+	pk_seq_t seqnum;
+#endif
+
+#ifdef USE_LENGTH
+	pk_len_t length;
+#endif
+
+#ifdef USE_COMMAND	
+	pk_cmd_t command;
+#endif
+
 	uint8_t *data;
-	//uint8_t endByte;
-	uint8_t crc ;
+
+#ifdef USE_ENDBYTE
+	pk_end_t endbtye;
+#endif
+
+#ifdef USE_CRC
+	pk_crc_t crc ;
+#endif
 
 }Packet;
 
 /* Packet function*/
 Packet* createPacket();
 void deletePacket(Packet *pk);
-void setPacketHeader(Packet *pk, uint8_t header);
-void setPacketLegnth(Packet *pk, uint8_t length);
-void setPacketCommnad(Packet *pk, uint8_t command);
+
+void setPacketHeader(Packet *pk, pk_hdr_t header);
+pk_hdr_t getPacketHeader(Packet *pk);
+
+#ifdef USE_SEQNUM
+void setPacketSeqnum(Packet *pk, pk_seq_t seqnum);
+pk_seq_t getPacketSeqnum(Packet *pk);
+#endif
+
+#ifdef USE_LENGTH
+void setPacketLegnth(Packet *pk, pk_len_t length);
+pk_len_t getPacketLegnth(Packet *pk);
+#endif
+
+#ifdef USE_COMMAND	
+void setPacketCommnad(Packet *pk, pk_cmd_t command);
+pk_cmd_t getPacketCommnad(Packet *pk);
+#endif
+
 void setPacketData(Packet *pk, void *data);
-void setPacketCrc(Packet *pk, uint8_t crc);
-uint8_t getPacketHeader(Packet *pk);
-uint8_t getPacketLegnth(Packet *pk);
-uint8_t getPacketCommnad(Packet *pk);
-void getPacketData(Packet *pk, uint8_t *data);
-uint8_t getPacketCrc(Packet *pk);
+void getPacketData(Packet *pk, void *data);
+
+#ifdef USE_ENDBYTE
+void setPacketEndbyte(Packet *pk, pk_end_t endbtye);
+pk_end_t getPacketEndbyte(Packet *pk);
+#endif
+
+#ifdef USE_CRC
+void setPacketCrc(Packet *pk, pk_crc_t crc);
+pk_crc_t getPacketCrc(Packet *pk);
+#endif
+
 size_t calcPacketSize(Packet *pk, size_t data_len);
-
 void pack(Packet *pk, uint8_t *buf);
-void unpack(uint8_t *buf, Packet *pk);
-void printPacket(Packet *pk);
-
+void unpack(uint8_t *buf, Packet *pk, uint32_t *map[]);
 #endif
