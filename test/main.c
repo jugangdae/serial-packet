@@ -5,6 +5,7 @@
 
 #include "packet.h"
 #include "packet_user.h"
+#include "crc8.h"
 
 Packet *pk;
 uint8_t buf[BUF_SIZE];
@@ -84,12 +85,12 @@ void pack_test(pk_cmd_t cmd) {
         memcpy(userdata_1.name, "JU\0", 3);
         memcpy(userdata_1.text, "HELLO WORLD\0", 12);
         setPacketHeader(pk, PACKET_HEADER);
-        //setPacketSeqnum(pk, 0x0);
         setPacketLegnth(pk, calcPacketSize(pk, sizeof(userdata_1)));
+        //setPacketSeqnum(pk, 0x0);
         setPacketCommnad(pk, cmd);
         setPacketData(pk, &userdata_1);
         //setPacketEndbyte(pk, PACKET_ENDBYTE);
-        setPacketCrc(pk, 0xC);
+        setPacketCrc(pk, 0x0);
 
     } else if (cmd == 0x1) {
         userdata_2.h = 5;
@@ -101,13 +102,19 @@ void pack_test(pk_cmd_t cmd) {
         setPacketCommnad(pk, cmd);
         setPacketData(pk, &userdata_2);
         //setPacketEndbyte(pk, PACKET_ENDBYTE);
-        setPacketCrc(pk, 0xC);
+        setPacketCrc(pk, 0x0);
     }
-
+    
+    
     check_status(1, pk, buf);
 
     printf("packing..\n");
     pack(pk, buf);
+
+    int len = getPacketLegnth(pk);
+    int crc = crc8(buf, len-1);
+    buf[len-1] = crc;
+    setPacketCrc(pk, crc);
 
     check_status(2, pk, buf);
 }
@@ -116,6 +123,7 @@ int main() {
     printf("init userdata..\n");
     memset(&userdata_1, 0, sizeof(UserData1));
     memset(&userdata_2, 0, sizeof(UserData2));
+    init_crc8();
 
     printf("init command..\n");
     cmd_map[0x0] = (pointer_t)&userdata_1;
@@ -129,7 +137,7 @@ int main() {
     /* ----- Test code ----- */
     pack_test(0x0);
     //pack_test(0x1);
-    unpack_test(sample_1, sizeof(sample_1));
+    //unpack_test(sample_1, sizeof(sample_1));
     //unpack_test(sample_2, sizeof(sample_2));
 
     return 0;

@@ -7,9 +7,9 @@
 #define NUM_OF_CMD 3
 
 #define USE_LENGTH
-#define USE_SEQNUM
+//#define USE_SEQNUM
 #define USE_COMMAND
-#define USE_ENDBYTE
+//#define USE_ENDBYTE
 #define USE_CRC
 
 #define HEADER_TYPE uint8_t
